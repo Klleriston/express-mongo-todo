@@ -5,6 +5,8 @@ import { EnvValidator } from './utils/envValidator';
 import mongoose from 'mongoose';
 import { registerRoutes } from './routes';
 import { errorHandler } from './middlewares/errorHandler';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
 
 dotenv.config();
 
@@ -18,8 +20,12 @@ class Server {
     const env = EnvValidator.validate(['MONGODB_URI', 'PORT']);
     this.port = Number(env.PORT);
 
+    this.initializeDatabase().catch(() => {
+      process.exit(1);
+    });
     this.initializeMiddlewares();
     this.initializeRoutes();
+    this.initializeErrorHandling();
   }
 
   private async initializeDatabase(): Promise<void> {
@@ -38,27 +44,32 @@ class Server {
 
   private initializeRoutes(): void {
     registerRoutes(this.app);
+    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  }
+
+  private initializeErrorHandling(): void {
+    process.on('unhandledRejection', (reason: Error) => {
+      console.error(`Unhandled Rejection: ${reason.message || reason}`);
+      process.exit(1);
+    });
+
+    process.on('uncaughtException', (error: Error) => {
+      console.error(`Uncaught Exception: ${error.message}`);
+      process.exit(1);
+    });
   }
 
   public start(): void {
-    this.initializeDatabase();
     const server = this.app.listen(this.port, () => {
       console.log(`Servidor rodando na porta ${this.port}`);
     });
 
     process.on('SIGINT', () => {
       console.info('\nRecebido SIGINT. Encerrando servidor...');
-      server.close(() => {
-        mongoose.connection
-          .close()
-          .then(() => {
-            console.info('Servidor e conexão com MongoDB encerrados');
-            process.exit(0);
-          })
-          .catch((error) => {
-            console.error('Erro ao encerrar a conexão com MongoDB', error);
-            process.exit(1);
-          });
+      server.close(async () => {
+        await mongoose.connection.close();
+        console.info('Servidor e conexão com MongoDB encerrados');
+        process.exit(0);
       });
     });
   }
