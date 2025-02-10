@@ -1,8 +1,7 @@
 import { NotFoundError, ValidationError } from '../../errors/customErrors';
 import { IUser } from '../../interfaces/types/user.types';
-import { User } from '../../models/user/user.models';
+import { User } from '../../models/user/user.model';
 import bcrypt  from 'bcrypt';
-
 
 export class UserService {
   static async createUser(userData: IUser): Promise<IUser> {
@@ -14,6 +13,12 @@ export class UserService {
   }
 
   static async getAllUsers(page: number = 1, limit: number = 10): Promise<{ users: IUser[]; total: number }> {
+    if (page < 1 || limit < 1) {
+      throw new ValidationError(
+        'Os parâmetros \'page\' e \'limit\' devem ser maiores que zero.',
+      );
+    }
+    
     const skip = (page - 1) * limit;
     const [users, total] = await Promise.all([
       User.find().skip(skip).limit(limit),

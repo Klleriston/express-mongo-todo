@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
@@ -12,7 +13,8 @@ export const connectToDatabase = async (): Promise<void> => {
 
   try {
     await mongoose.connect(connection);
-  } catch {    
+  } catch (error) {
+    console.error('Falha na inicialização do banco de dados:', error);
     process.exit(1);
   }
 };

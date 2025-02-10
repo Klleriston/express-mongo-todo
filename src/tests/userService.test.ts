@@ -1,11 +1,11 @@
-import { User } from '../models/user/user.models';
+import { User } from '../models/user/user.model';
 import { UserService } from '../service/user/user.service';
 import { ValidationError, NotFoundError } from '../errors/customErrors';
 import bcrypt from 'bcrypt';
 import { UserCreationData } from '../interfaces/types/userCreationData.types';
 import { IUser } from '../interfaces/types/user.types';
 
-jest.mock('../models/user/user.models');
+jest.mock('../models/user/user.model.ts');
 jest.mock('bcrypt');
 
 describe('UserService', () => {

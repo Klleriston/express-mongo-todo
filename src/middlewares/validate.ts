@@ -8,11 +8,16 @@ export const validate =
       schema.parse(req.body);
       next();
     } catch (error) {
-      res
-        .status(400)
-        .json({
-          message: 'Erro de validação',
-          errors: (error as ZodError).errors,
+      if (error instanceof ZodError) {
+        res.status(400).json({
+          error: 'Erro de validação',
+          details: error.errors.map((e) => ({
+            field: e.path.join('.'),
+            message: e.message,
+          })),
         });
+        return;
+      }
+      next(error);
     }
   };
