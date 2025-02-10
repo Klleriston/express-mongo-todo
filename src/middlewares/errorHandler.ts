@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { AppError } from "../errors/customErrors";
+import { Request, Response, NextFunction } from 'express';
+import { AppError } from '../errors/customErrors';
 
 export const errorHandler = (
   err: Error,
@@ -10,7 +10,6 @@ export const errorHandler = (
   if (err instanceof AppError) {
     res.status(err.statusCode).json({ message: err.message });
   } else {
-    console.error(err);
-    res.status(500).json({ message: "Erro interno no servidor." });
+    res.status(500).json({ message: 'Erro interno no servidor.', error: err.message });
   }
 };

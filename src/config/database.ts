@@ -12,8 +12,7 @@ export const connectToDatabase = async (): Promise<void> => {
 
   try {
     await mongoose.connect(connection);
-  } catch (error) {
-    console.error('Falha na inicialização do banco de dados:', error);
+  } catch {    
     process.exit(1);
   }
 };
