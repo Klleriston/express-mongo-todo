@@ -25,20 +25,20 @@ export class UserService {
 
   static async getUserById(id: string): Promise<IUser> {
     const user = await User.findById(id);
-    if (!user) throw new NotFoundError('Usuário');
+    if (!user) throw new NotFoundError('Usuário não encontrado');
     
     return user;
   }
 
   static async updateUser(id: string, userData: Partial<IUser>): Promise<IUser> {
     const user = await User.findByIdAndUpdate(id, userData, { new: true });
-    if (!user) throw new NotFoundError('Usuário');
+    if (!user) throw new NotFoundError('Usuário não encontrado');
 
     return user;
   }
 
   static async deleteUser(id: string): Promise<void> {
     const user = await User.findByIdAndDelete(id);
-    if (!user) throw new NotFoundError('Usuário');
+    if (!user) throw new NotFoundError('Usuário não encontrado');
   }
 }
